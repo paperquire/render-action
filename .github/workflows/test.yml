@@ -1,0 +1,55 @@
+name: Test Action
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create sample Markdown
+        run: |
+          mkdir -p docs
+          cat > docs/sample.md << 'MARKDOWN'
+          # Sample Document
+
+          This is a test document for the PaperQuire render action.
+
+          ## Section One
+
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+          ## Section Two
+
+          - Item one
+          - Item two
+          - Item three
+
+          | Header A | Header B |
+          |----------|----------|
+          | Cell 1   | Cell 2   |
+          | Cell 3   | Cell 4   |
+          MARKDOWN
+
+      - name: Run render action
+        uses: ./
+        id: render
+        with:
+          files: 'docs/*.md'
+          output: build/pdfs
+
+      - name: Verify output
+        run: |
+          echo "Generated files:"
+          echo "${{ steps.render.outputs.pdf-files }}"
+          test -f build/pdfs/sample.pdf && echo "PDF generated successfully" || (echo "PDF not found" && exit 1)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-pdfs
+          path: build/pdfs/

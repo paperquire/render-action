@@ -1,0 +1,32 @@
+name: 'PaperQuire Render'
+description: 'Render Markdown files to branded, print-ready PDFs using PaperQuire'
+author: 'PaperQuire'
+
+inputs:
+  files:
+    description: 'Glob pattern for Markdown files (e.g. docs/*.md)'
+    required: true
+  template:
+    description: 'Template ID to use for rendering'
+    required: false
+    default: 'minimal-clean'
+  output:
+    description: 'Output directory for generated PDFs'
+    required: false
+    default: 'output/'
+
+outputs:
+  pdf-files:
+    description: 'Newline-separated list of generated PDF file paths'
+
+branding:
+  icon: 'file-text'
+  color: 'blue'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.files }}
+    - ${{ inputs.template }}
+    - ${{ inputs.output }}
